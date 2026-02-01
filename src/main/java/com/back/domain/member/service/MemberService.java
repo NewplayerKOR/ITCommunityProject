@@ -93,9 +93,4 @@ public class MemberService {
 
         member.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
     }
-
-
-
-
-
 }
