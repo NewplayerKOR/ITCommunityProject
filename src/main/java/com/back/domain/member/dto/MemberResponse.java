@@ -1,12 +1,9 @@
 package com.back.domain.member.dto;
 
+import com.back.domain.member.entity.Member;
 import com.back.domain.member.entity.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -14,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class MemberResponse {
     private Long id;
@@ -23,4 +20,15 @@ public class MemberResponse {
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public static MemberResponse from(Member member) {
+        return MemberResponse.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .role(member.getRole())
+                .createdAt(member.getCreatedAt())
+                .updatedAt(member.getUpdatedAt())
+                .build();
+    }
 }
