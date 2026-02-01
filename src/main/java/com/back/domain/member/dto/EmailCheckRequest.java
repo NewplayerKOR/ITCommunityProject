@@ -1,14 +1,13 @@
 package com.back.domain.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * 이메일 중복 확인 요청 DTO
  */
 @Getter
-@NoArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class EmailCheckRequest {
     private String email;
