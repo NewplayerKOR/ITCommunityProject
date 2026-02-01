@@ -40,4 +40,4 @@ out/
 .env
 
 ### GEMINI ###
-GEMINI_CONTEXT.md
+GEMINI.md
