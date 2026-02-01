@@ -10,5 +10,5 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class NicknameUpdateRequest {
-    private String nickname;
+    private String newNickname;
 }
