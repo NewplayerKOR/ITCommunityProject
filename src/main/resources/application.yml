@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: dev
+  
+  jpa:
+    open-in-view: false # 성능 및 OSIV 관련 경고 방지
+    hibernate:
+      ddl-auto: none # 기본 값 none, 각 프로필에서 제어
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
