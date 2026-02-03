@@ -31,6 +31,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()   // Swagger 허용
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
