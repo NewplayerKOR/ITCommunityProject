@@ -17,80 +17,86 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * 회원가입
-     */
-    public MemberJoinResponse join(MemberJoinRequest memberJoinRequest) {
+    /** 회원가입 */
+    @Transactional
+    public MemberJoinResponse join(MemberJoinRequest request) {
         // 이메일 중복 검증
-        if (memberRepository.existsByEmail(memberJoinRequest.getEmail())) {
+        if (isEmailDublicated(request.getEmail())) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
         // 엔티티 생성 및 저장
-        Member member = Member.builder()
-                .email(memberJoinRequest.getEmail())
-                .password(passwordEncoder.encode(memberJoinRequest.getPassword())) // 암호화 필수
-                .nickname(memberJoinRequest.getNickname())
-                .role(Role.USER)
-                .build();
+        Member member = Member.createMember(
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getNickname(),
+                Role.USER
+        );
 
         Member savedMember = memberRepository.save(member);
-
         return MemberJoinResponse.from(savedMember);
-
     }
 
-    /**
-     * 로그인
-     */
-    public LoginResponse login(LoginRequest loginRequest) {
-        Member member = memberRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    /** 로그인 */
+    public LoginResponse login(LoginRequest request) {
+        Member member = findByEmail(request.getEmail());
 
-        if (!passwordEncoder.matches(loginRequest.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
         return LoginResponse.from(member);
     }
 
-    /**
-     * 회원 상세 정보 조회
-     */
-    public MemberResponse getMember(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    /** 이메일 중복 확인 */
+    public boolean isEmailDublicated(String email) {
+        return memberRepository.existsByEmail(email);
+    }
 
+    /** 닉네임 중복 확인 */
+    public boolean isNicknameDuplicated(String nickname) {
+        return memberRepository.existsByNickname(nickname);
+    }
+
+    /** 회원 상세 정보 조회 */
+    public MemberResponse getMember(Long memberId) {
+        Member member = findMemberById(memberId);
         return MemberResponse.from(member);
     }
 
-    /**
-     * 닉네임 수정
-     */
+    /** 닉네임 수정 */
     @Transactional
-    public void updateNickname(Long memberId, NicknameUpdateRequest nicknameUpdateRequest) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    public void updateNickname(Long memberId, NicknameUpdateRequest request) {
+        Member member = findMemberById(memberId);
 
-        if (memberRepository.existsByNickname(nicknameUpdateRequest.getNewNickname())) {
+        if(isNicknameDuplicated(request.getNewNickname())) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
         }
 
-        member.updateNickname(nicknameUpdateRequest.getNewNickname());
+        member.updateNickname(request.getNewNickname());
     }
 
-    /**
-     * 비밀번호 변경
-     */
+    /** 비밀번호 변경 */
     @Transactional
-    public void changePassword(Long memberId, PasswordChangeRequest passwordChangeRequest) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    public void changePassword(Long memberId, PasswordChangeRequest request) {
+        Member member = findMemberById(memberId);
 
-        if (!passwordEncoder.matches(passwordChangeRequest.getNewPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(request.getNewPassword(), member.getPassword())) {
             throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
         }
 
-        member.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+        member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+
+    // --- Private Helper Method ---
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+    }
+
+    private Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
     }
 }
