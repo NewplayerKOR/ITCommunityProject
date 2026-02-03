@@ -31,7 +31,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
-    // 생성자 (Builder 패턴 사용)
+    /** 생성자 (Builder 패턴 사용) */
     @Builder
     public Member(String email, String password, String nickname, Role role) {
         this.email = email;
@@ -40,12 +40,22 @@ public class Member extends BaseTimeEntity {
         this.role = role;
     }
 
-    // 비즈니스 로직: 회원 정보 수정
+    /** Entity 생성 정적 팩토리 메서드 */
+    public static Member createMember(String email, String password, String nickname, Role role) {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .role(role)
+                .build();
+    }
+
+    /** 비즈니스 로직: 회원 정보 수정 */
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    // 비즈니스 로직: 비밀번호 수정
+    /** 비즈니스 로직: 비밀번호 수정 */
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
